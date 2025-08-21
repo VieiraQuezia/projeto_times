@@ -3,9 +3,9 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Provider as PaperProvider } from 'react-native-paper';
-import LoginScreen from './LoginScreen';
-import FeedScreen from './FeedScreen';
-import DetalhesScreen from './DetalhesScreen';
+import LoginScreen from './pages/LoginScreen';
+import FeedScreen from './pages/FeedScreen';
+import DetalhesScreen from './pages/DetalhesScreen';
 
 // Cria o navegador em pilha
 const Stack = createNativeStackNavigator();
