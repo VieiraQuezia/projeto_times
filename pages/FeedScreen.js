@@ -16,6 +16,7 @@ import internacional from '../assets/camisas/internacional.jpg'
 import santos from '../assets/camisas/santos1.jpg'
 import saopaulo from '../assets/camisas/saopaulo.jpg'
 import vasco from '../assets/camisas/vasco.jpg'
+import botafogo from '../assets/camisas/botafogo.jpg'
 
 
 const shirtsData = [
@@ -103,7 +104,7 @@ const shirtsData = [
     id: 11,
     name: "Camisa Botafogo 2024",
     price: 279.90,
-    image: "https://botafogo.vtexassets.com/arquivos/ids/165364-1600-auto?v=638890584725870000&width=1600&height=auto&aspect=true", // URL
+    image: {botafogo}, 
     sizes: ["P", "M", "G", "GG"],
     colors: ["Preto", "Branco"]
   },
