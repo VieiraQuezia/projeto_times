@@ -4,6 +4,9 @@ import { Card, Title, Paragraph, Chip, Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 
+//imagens camisas
+
+
 const shirtsData = [
   {
     id: 1,

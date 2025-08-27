@@ -16,7 +16,7 @@ const App = () => {
     
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="Feed"
+          initialRouteName="Login"
           screenOptions={{
             headerStyle: {
               backgroundColor: '#6200ee',
