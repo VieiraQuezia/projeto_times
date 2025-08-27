@@ -10,13 +10,16 @@ import {
 import { Card, Button, Chip, Text, Title, Paragraph } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 
+// Recebe "route" (parâmetros da navegação) e "navigation" (controle de rotas)
 const DetalhesScreen = ({ route, navigation }) => {
+  // Extrai o objeto "shirt" enviado pela navegação
   const { shirt } = route.params;
   const [visivel, setVisivel] = useState(false);
   const [rua, setRua] = useState("");
   const [bairro, setBairro] = useState("");
   const [numero, setNumero] = useState("");
 
+  // Renderização da tela
   return (
     <LinearGradient colors={["#f0f0f0", "#ffffff"]} style={styles.gradient}>
       <ScrollView style={styles.container}>
@@ -32,16 +35,18 @@ const DetalhesScreen = ({ route, navigation }) => {
               R$ {shirt.price.toFixed(2)}
             </Text>
 
-            <Text variant="titleSmall" style={styles.sectionTitle}>
-              Tamanhos Disponíveis:
-            </Text>
-            <View style={styles.chipContainer}>
-              {shirt.sizes.map((size, i) => (
-                <Chip key={i} icon="tshirt-crew" style={styles.chip}>
-                  {size}
-                </Chip>
-              ))}
-            </View>
+          {/* Seção: tamanhos disponíveis */}
+          <Text variant="titleSmall" style={styles.sectionTitle}>
+            Tamanhos Disponíveis:
+          </Text>
+          <View style={styles.chipContainer}>
+            {/* Cria um chip para cada tamanho da camisa */}
+            {shirt.sizes.map((size, i) => (
+              <Chip key={i} icon="tshirt-crew" style={styles.chip}>
+                {size}
+              </Chip>
+            ))}
+          </View>
 
             <Text variant="titleSmall" style={styles.sectionTitle}>
               Cores Disponíveis:
@@ -133,10 +138,8 @@ const DetalhesScreen = ({ route, navigation }) => {
   );
 };
 
+// Estilos usados no componente
 const styles = StyleSheet.create({
-  gradient: {
-    flex: 1,
-  },
   container: {
     flex: 1,
     padding: 15,
@@ -151,7 +154,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 15,
   },
   content: {
-    padding: 15,
+    padding: 15,       
   },
   cardTitle: {
     fontWeight: "bold",
@@ -180,9 +183,8 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   chip: {
-    marginRight: 5,
-    marginBottom: 5,
-    borderRadius: 10,
+    marginRight: 5,  
+    marginBottom: 5, 
   },
   actions: {
     justifyContent: "space-around",
