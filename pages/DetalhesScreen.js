@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
   Alert,
   ScrollView,
+  Image
 } from "react-native";
 import {
   Card,
@@ -15,6 +16,7 @@ import {
   TextInput,
 } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
+import AsyncStorage from "@react-native-async-storage/async-storage"; 
 
 const DetalhesScreen = ({ route, navigation }) => {
   const { shirt } = route.params;
@@ -24,9 +26,33 @@ const DetalhesScreen = ({ route, navigation }) => {
   const [rua, setRua] = useState("");
   const [bairro, setBairro] = useState("");
   const [numero, setNumero] = useState("");
+ const [usuario, setUsuario] = useState(null);
 
+  useEffect(() => {
+    const carregarUsuario = async () => {
+      try {
+        const data = await AsyncStorage.getItem('@usuario'); 
+        if (data !== null) {
+          setUsuario(JSON.parse(data)); 
+        }
+      } catch (e) {
+        console.log('Erro ao carregar usuário:', e);
+      }
+    };
+    carregarUsuario();
+  }, []);
   return (
     <LinearGradient colors={["#ffffff", "#045071"]} style={styles.gradient}>
+     {/* Header com usuário */}
+        {usuario && (
+          <View style={styles.userHeader}>
+            <Text style={styles.userName}>{usuario.nickname}</Text>
+            <Image
+              source={{ uri: usuario.foto || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }}
+              style={styles.userImage}
+            />
+          </View>
+        )}
       <ScrollView style={styles.container}>
         <Card style={styles.card}>
           <Card.Cover source={shirt.image} style={styles.cardImage} />
@@ -152,6 +178,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     elevation: 5,
     backgroundColor: "rgba(255, 255, 255, 0.95)",
+    marginTop:130,
   },
   cardImage: {
     borderTopLeftRadius: 15,
@@ -235,6 +262,27 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     marginTop: 10,
+  },
+    userHeader: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  userName: {
+    color: '#045071',
+    fontWeight: 'bold',
+    marginRight: 10,
+    fontSize: 16,
+  },
+  userImage: {
+    width: 45,
+    height: 45,
+    borderRadius: 22.5,
+    borderWidth: 2,
+    borderColor: '#fff',
   },
 });
 

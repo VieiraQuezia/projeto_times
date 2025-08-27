@@ -5,8 +5,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from './pages/LoginScreen';
 import FeedScreen from './pages/FeedScreen';
 import DetalhesScreen from './pages/DetalhesScreen';
+import HomeScreen from './pages/Home'
 
-// Cria o navegador em pilha
 const Stack = createNativeStackNavigator();
 
 
@@ -19,15 +19,20 @@ const App = () => {
           initialRouteName="Login"
           screenOptions={{
             headerStyle: {
-              backgroundColor: '#6200ee',
+              backgroundColor: '#fff',
             },
-            headerTintColor: '#fff',
+            headerTintColor: '#045071',
           }}
         >
           <Stack.Screen 
             name="Login" 
             component={LoginScreen} 
             options={{ title: 'Login' }}
+          />
+          <Stack.Screen 
+            name="Home" 
+            component={HomeScreen} 
+            options={{ title: 'Home' }}
           />
           <Stack.Screen 
             name="Feed" 
