@@ -5,6 +5,17 @@ import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 //imagens camisas
+import atleticomg from '../assets/camisas/atleticomg.jpg'
+import corinthians from '../assets/camisas/corinthians.jpg'
+import corinthians2 from '../assets/camisas/corinthians2.jpg'
+import palmeiras from '../assets/camisas/palmeiras.jpg'
+import cruzeiro from '../assets/camisas/cruzeiro.jpg'
+import flamengo from '../assets/camisas/flamengo.jpg'
+import fluminense from '../assets/camisas/fluminense.jpg'
+import internacional from '../assets/camisas/internacional.jpg'
+import santos from '../assets/camisas/santos1.jpg'
+import saopaulo from '../assets/camisas/saopaulo.jpg'
+import vasco from '../assets/camisas/vasco.jpg'
 
 
 const shirtsData = [
@@ -12,7 +23,15 @@ const shirtsData = [
     id: 1,
     name: "Camisa Flamengo 2024",
     price: 299.90,
-    image: "https://placehold.co/600x600/red/black?text=FLA",
+    image: {flamengo},
+    sizes: ["P", "M", "G", "GG"],
+    colors: ["Vermelho", "Preto"]
+  },
+  {
+    id: 1,
+    name: "Camisa Vasco 2024",
+    price: 299.90,
+    image: {vasco},
     sizes: ["P", "M", "G", "GG"],
     colors: ["Vermelho", "Preto"]
   },
@@ -20,7 +39,7 @@ const shirtsData = [
     id: 2,
     name: "Camisa São Paulo 2024",
     price: 289.90,
-    image: "https://placehold.co/600x600/white/red?text=SPFC",
+    image: {saopaulo},
     sizes: ["P", "M", "G", "GG"],
     colors: ["Branco", "Vermelho", "Preto"]
   },
@@ -28,7 +47,15 @@ const shirtsData = [
     id: 3,
     name: "Camisa Corinthians 2024",
     price: 279.90,
-    image: "https://placehold.co/600x600/black/white?text=SCCP",
+    image: {corinthians},
+    sizes: ["P", "M", "G", "GG"],
+    colors: ["Preto", "Branco"]
+  },
+  {
+    id: 3,
+    name: "Camisa Corinthians Yuri Alberto 2024",
+    price: 279.90,
+    image: {corinthians2},
     sizes: ["P", "M", "G", "GG"],
     colors: ["Preto", "Branco"]
   },
@@ -36,15 +63,15 @@ const shirtsData = [
     id: 4,
     name: "Camisa Santos 2024",
     price: 269.90,
-    image: "https://placehold.co/600x600/white/black?text=SFC",
+    image: {santos},
     sizes: ["P", "M", "G", "GG"],
     colors: ["Branco", "Preto"]
   },
   {
     id: 5,
-    name: "Camisa Grêmio 2024",
+    name: "Camisa Atlético Mineiro 2024",
     price: 289.90,
-    image: "https://placehold.co/600x600/0099ff/black?text=GRE",
+    image: {atleticomg},
     sizes: ["P", "M", "G", "GG"],
     colors: ["Azul", "Preto", "Branco"]
   },
@@ -52,15 +79,15 @@ const shirtsData = [
     id: 6,
     name: "Camisa Internacional 2024",
     price: 289.90,
-    image: "https://placehold.co/600x600/red/white?text=INT",
+    image: {internacional},
     sizes: ["P", "M", "G", "GG"],
     colors: ["Vermelho", "Branco"]
   },
   {
     id: 7,
-    name: "Camisa Atlético Mineiro 2024",
+    name: "Camisa Palmeiras 2024",
     price: 299.90,
-    image: "https://placehold.co/600x600/black/white?text=CAM",
+    image: {palmeiras},
     sizes: ["P", "M", "G", "GG"],
     colors: ["Preto", "Branco"]
   },
@@ -68,7 +95,7 @@ const shirtsData = [
     id: 8,
     name: "Camisa Fluminense 2024",
     price: 289.90,
-    image: "https://placehold.co/600x600/660000/white?text=FLU",
+    image: {fluminense},
     sizes: ["P", "M", "G", "GG"],
     colors: ["Verde", "Grená", "Branco"]
   },
@@ -84,7 +111,7 @@ const shirtsData = [
     id: 10,
     name: "Camisa Cruzeiro 2024",
     price: 289.90,
-    image: "https://placehold.co/600x600/0033cc/white?text=CRU",
+    image: {cruzeiro},
     sizes: ["P", "M", "G", "GG"],
     colors: ["Azul", "Branco"]
   },
@@ -125,7 +152,7 @@ const FeedScreen = () => {
         </View>
 
         <FlatList
-          data={shirtsData}
+          data={shirtsData} // fonte dos dados das camisas
           renderItem={renderItem}
           keyExtractor={item => item.id.toString()}
           contentContainerStyle={styles.list}
