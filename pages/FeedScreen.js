@@ -53,10 +53,12 @@ const FeedScreen = () => {
       onPress={() => navigation.navigate('Detalhes', { shirt: item })}
     >
       <Card.Cover source={item.image} />
+
       <Card.Content>
         <Title style={styles.cardTitle}>{item.name}</Title>
         <Paragraph style={styles.cardPrice}>R$ {item.price.toFixed(2)}</Paragraph>
       </Card.Content>
+      
     </Card>
   );
 
@@ -90,7 +92,6 @@ const FeedScreen = () => {
               selectedValue={selectedTeam}
               style={styles.pickerAndroid}
               onValueChange={(itemValue) => setSelectedTeam(itemValue)}
-              mode="dialog" // Melhor no Android
               dropdownIconColor="black"
             >
               <Picker.Item label="Todos os Times" value="Todos" />
