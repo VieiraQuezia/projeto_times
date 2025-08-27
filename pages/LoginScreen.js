@@ -34,7 +34,7 @@ const LoginScreen = () => {
       
       if (username === 'aluno' && password === '123') {
         navigation.navigate('Feed');
-        Alert.alert('Login Realizado', 'Usuário ou senha incorretos');
+        Alert.alert('Login Realizado');
 
       } else {
         Alert.alert('Erro', 'Usuário ou senha incorretos');
