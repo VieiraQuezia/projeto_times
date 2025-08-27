@@ -103,7 +103,7 @@ const shirtsData = [
     id: 11,
     name: "Camisa Botafogo 2024",
     price: 279.90,
-    image: "https://placehold.co/600x600/000000/white?text=BFR", // URL
+    image: "https://botafogo.vtexassets.com/arquivos/ids/165364-1600-auto?v=638890584725870000&width=1600&height=auto&aspect=true", // URL
     sizes: ["P", "M", "G", "GG"],
     colors: ["Preto", "Branco"]
   },
