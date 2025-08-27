@@ -104,7 +104,7 @@ const shirtsData = [
     id: 11,
     name: "Camisa Botafogo 2024",
     price: 279.90,
-    image: {botafogo}, 
+    image: botafogo, 
     sizes: ["P", "M", "G", "GG"],
     colors: ["Preto", "Branco"]
   },
