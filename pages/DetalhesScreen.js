@@ -108,7 +108,6 @@ const DetalhesScreen = ({ route, navigation }) => {
               onChangeText={setNumero}
             />
             <Button
-              mode="contained"
               onPress={() => {
                 if (!rua || !bairro || !numero) {
                   Alert.alert("Erro", "Por favor, preencha todos os campos.");
@@ -125,7 +124,6 @@ const DetalhesScreen = ({ route, navigation }) => {
               Finalizar Pedido
             </Button>
             <Button
-              mode="outlined"
               onPress={() => setVisivel(false)}
               style={styles.cancelButton}
             >
