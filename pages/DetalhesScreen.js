@@ -1,41 +1,39 @@
-
-import React from 'react';
-import { View, StyleSheet, Alert, ScrollView } from 'react-native';
-import { Card, Button, Title, Paragraph, Chip, Text } from 'react-native-paper';
+import React, { useState } from "react";
+import {
+  View,
+  StyleSheet,
+  Alert,
+  ScrollView,
+  TextInput,
+  Modal,
+} from "react-native";
+import { Card, Button, Chip, Text, Title, Paragraph } from "react-native-paper";
+import { LinearGradient } from "expo-linear-gradient";
 
 // Recebe "route" (parâmetros da navegação) e "navigation" (controle de rotas)
 const DetalhesScreen = ({ route, navigation }) => {
   // Extrai o objeto "shirt" enviado pela navegação
   const { shirt } = route.params;
-
-  // Função chamada ao clicar no botão "Comprar"
-  const handleComprar = () => {
-    // Exibe um alerta confirmando a compra
-    Alert.alert('Sucesso', 'Item adicionado ao carrinho');
-    // Volta para a tela anterior
-    navigation.goBack();
-  };
+  const [visivel, setVisivel] = useState(false);
+  const [rua, setRua] = useState("");
+  const [bairro, setBairro] = useState("");
+  const [numero, setNumero] = useState("");
 
   // Renderização da tela
   return (
-    <ScrollView style={styles.container}>
-      {/* Card do react-native-paper que agrupa o conteúdo */}
-      <Card>
-        {/* Exibe a imagem da camisa */}
-        <Card.Cover source={{ uri: shirt.image }} />
+    <LinearGradient colors={["#f0f0f0", "#ffffff"]} style={styles.gradient}>
+      <ScrollView style={styles.container}>
+        <Card style={styles.card}>
+          <Card.Cover source={{ uri: shirt.image }} style={styles.cardImage} />
+          <Card.Content style={styles.content}>
+            <Title style={styles.cardTitle}>{shirt.name}</Title>
+            <Paragraph style={styles.cardDescription}>
+              {shirt.description || "Camisa oficial do time"}
+            </Paragraph>
 
-        {/* Conteúdo principal dentro do card */}
-        <Card.Content style={styles.content}>
-          {/* Nome da camisa */}
-          <Title>{shirt.name}</Title>
-
-          {/* Descrição da camisa (ou mensagem padrão se não houver descrição) */}
-          <Paragraph>{shirt.description || 'Camisa oficial do time'}</Paragraph>
-          
-          {/* Preço */}
-          <Text variant="titleMedium" style={styles.price}>
-            R$ {shirt.price.toFixed(2)}
-          </Text>
+            <Text variant="titleMedium" style={styles.price}>
+              R$ {shirt.price.toFixed(2)}
+            </Text>
 
           {/* Seção: tamanhos disponíveis */}
           <Text variant="titleSmall" style={styles.sectionTitle}>
@@ -50,65 +48,183 @@ const DetalhesScreen = ({ route, navigation }) => {
             ))}
           </View>
 
-          {/* Seção: cores disponíveis */}
-          <Text variant="titleSmall" style={styles.sectionTitle}>
-            Cores Disponíveis:
-          </Text>
-          <View style={styles.chipContainer}>
-            {/* Cria um chip para cada cor da camisa */}
-            {shirt.colors.map((color, i) => (
-              <Chip key={i} icon="palette" style={styles.chip}>
-                {color}
-              </Chip>
-            ))}
+            <Text variant="titleSmall" style={styles.sectionTitle}>
+              Cores Disponíveis:
+            </Text>
+            <View style={styles.chipContainer}>
+              {shirt.colors.map((color, i) => (
+                <Chip key={i} icon="palette" style={styles.chip}>
+                  {color}
+                </Chip>
+              ))}
+            </View>
+          </Card.Content>
+
+          <Card.Actions style={styles.actions}>
+            <Button
+              mode="contained"
+              onPress={() => setVisivel(true)}
+              style={styles.button}
+            >
+              Comprar
+            </Button>
+            <Button
+              mode="outlined"
+              onPress={() => navigation.goBack()}
+              style={styles.button}
+            >
+              Voltar
+            </Button>
+          </Card.Actions>
+        </Card>
+      </ScrollView>
+
+      <Modal
+        visible={visivel}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setVisivel(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Endereço de Entrega</Text>
+            <TextInput
+              placeholder="Rua"
+              style={styles.input}
+              value={rua}
+              onChangeText={setRua}
+            />
+            <TextInput
+              placeholder="Bairro"
+              style={styles.input}
+              value={bairro}
+              onChangeText={setBairro}
+            />
+            <TextInput
+              placeholder="Número da Casa"
+              keyboardType="numeric"
+              style={styles.input}
+              value={numero}
+              onChangeText={setNumero}
+            />
+            <Button
+              mode="contained"
+              onPress={() => {
+                if (!rua || !bairro || !numero) {
+                  Alert.alert("Erro", "Por favor, preencha todos os campos.");
+                  return;
+                }
+                Alert.alert("Sucesso", "Item adicionado ao carrinho");
+                setRua("");
+                setBairro("");
+                setNumero("");
+                setVisivel(false);
+              }}
+              style={styles.finalizeButton}
+            >
+              Finalizar Pedido
+            </Button>
+            <Button
+              mode="outlined"
+              onPress={() => setVisivel(false)}
+              style={styles.cancelButton}
+            >
+              Cancelar
+            </Button>
           </View>
-        </Card.Content>
-        
-        {/* Área dos botões (ações do card) */}
-        <Card.Actions style={styles.actions}>
-          {/* Botão para comprar (chama a função handleComprar) */}
-          <Button mode="contained" onPress={handleComprar}>
-            Comprar
-          </Button>
-          {/* Botão para voltar à tela anterior */}
-          <Button mode="outlined" onPress={() => navigation.goBack()}>
-            Voltar
-          </Button>
-        </Card.Actions>
-      </Card>
-    </ScrollView>
+        </View>
+      </Modal>
+    </LinearGradient>
   );
 };
 
 // Estilos usados no componente
 const styles = StyleSheet.create({
   container: {
-    flex: 1,           
-    padding: 10,      
+    flex: 1,
+    padding: 15,
+  },
+  card: {
+    borderRadius: 15,
+    elevation: 5,
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+  },
+  cardImage: {
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
   },
   content: {
     padding: 15,       
   },
+  cardTitle: {
+    fontWeight: "bold",
+    fontSize: 20,
+    color: "#212121",
+  },
+  cardDescription: {
+    marginVertical: 10,
+    color: "#555555",
+  },
   price: {
-    marginVertical: 10, 
-    fontWeight: 'bold', 
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#6200ee",
+    marginVertical: 10,
   },
   sectionTitle: {
-    marginTop: 15,    
-    marginBottom: 5,    
+    marginTop: 15,
+    marginBottom: 5,
+    fontWeight: "600",
+    color: "#212121",
   },
   chipContainer: {
-    flexDirection: 'row', 
-    flexWrap: 'wrap',    
-    marginVertical: 5,   
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginVertical: 5,
   },
   chip: {
     marginRight: 5,  
     marginBottom: 5, 
   },
   actions: {
-    justifyContent: 'space-around',
-    padding: 10,                    
+    justifyContent: "space-around",
+    padding: 10,
+  },
+  button: {
+    borderRadius: 10,
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fundo semi-transparente
+  },
+  modalContent: {
+    width: "80%",
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 20,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 15,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    padding: 10,
+    marginVertical: 10,
+  },
+  finalizeButton: {
+    marginTop: 10,
+  },
+  cancelButton: {
+    marginTop: 10,
   },
 });
 
