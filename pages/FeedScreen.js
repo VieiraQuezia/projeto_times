@@ -1,5 +1,14 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, FlatList, RefreshControl, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { 
+  View, 
+  StyleSheet, 
+  FlatList, 
+  RefreshControl, 
+  Platform, 
+  Image, 
+  Text 
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Card, Title, Paragraph } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -37,6 +46,21 @@ const FeedScreen = () => {
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState("Todos"); 
+  const [usuario, setUsuario] = useState(null);
+
+  useEffect(() => {
+    const carregarUsuario = async () => {
+      try {
+        const data = await AsyncStorage.getItem('@usuario'); 
+        if (data !== null) {
+          setUsuario(JSON.parse(data)); 
+        }
+      } catch (e) {
+        console.log('Erro ao carregar usuário:', e);
+      }
+    };
+    carregarUsuario();
+  }, []);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -53,12 +77,10 @@ const FeedScreen = () => {
       onPress={() => navigation.navigate('Detalhes', { shirt: item })}
     >
       <Card.Cover source={item.image} />
-
       <Card.Content>
         <Title style={styles.cardTitle}>{item.name}</Title>
         <Paragraph style={styles.cardPrice}>R$ {item.price.toFixed(2)}</Paragraph>
       </Card.Content>
-      
     </Card>
   );
 
@@ -66,12 +88,24 @@ const FeedScreen = () => {
     <LinearGradient colors={['#045071', '#ffffff']} style={styles.gradient}>
       <View style={styles.container}>
 
+        {/* Header com usuário */}
+        {usuario && (
+          <View style={styles.userHeader}>
+            <Text style={styles.userName}>{usuario.nickname}</Text>
+            <Image
+              source={{ uri: usuario.foto || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }}
+              style={styles.userImage}
+            />
+          </View>
+        )}
+
+        {/* Picker */}
         {Platform.OS === "ios" ? (
           <Picker
             selectedValue={selectedTeam}
             style={styles.pickerIOS}
             onValueChange={(itemValue) => setSelectedTeam(itemValue)}
-            mode="dropdown" // iOS aceita esse estilo
+            mode="dropdown"
           >
             <Picker.Item label="Todos os Times" value="Todos" />
             <Picker.Item label="Flamengo" value="Flamengo" />
@@ -92,6 +126,7 @@ const FeedScreen = () => {
               selectedValue={selectedTeam}
               style={styles.pickerAndroid}
               onValueChange={(itemValue) => setSelectedTeam(itemValue)}
+              mode="dialog"
               dropdownIconColor="black"
             >
               <Picker.Item label="Todos os Times" value="Todos" />
@@ -110,6 +145,7 @@ const FeedScreen = () => {
           </View>
         )}
 
+        {/* Lista */}
         <FlatList
           data={filteredShirts}
           renderItem={renderItem}
@@ -131,8 +167,29 @@ const FeedScreen = () => {
 const styles = StyleSheet.create({
   gradient: { flex: 1 },
   container: { flex: 1, padding: 15 },
+  userHeader: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  userName: {
+    color: 'white',
+    fontWeight: 'bold',
+    marginRight: 10,
+    fontSize: 16,
+  },
+  userImage: {
+    width: 45,
+    height: 45,
+    borderRadius: 22.5,
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
   pickerIOS: {
-    marginTop: -50,
+    marginTop: 30, 
     color: 'black',
     height: 50,
     marginBottom: 150,
@@ -141,6 +198,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
+    marginTop: 80,
     marginBottom: 20,
     overflow: 'hidden',
   },
