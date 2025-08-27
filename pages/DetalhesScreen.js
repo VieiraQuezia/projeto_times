@@ -4,27 +4,32 @@ import {
   StyleSheet,
   Alert,
   ScrollView,
-  TextInput,
-  Modal,
 } from "react-native";
-import { Card, Button, Chip, Text, Title, Paragraph } from "react-native-paper";
+import {
+  Card,
+  Button,
+  Chip,
+  Text,
+  Title,
+  Paragraph,
+  TextInput,
+} from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 
-// Recebe "route" (parâmetros da navegação) e "navigation" (controle de rotas)
 const DetalhesScreen = ({ route, navigation }) => {
-  // Extrai o objeto "shirt" enviado pela navegação
   const { shirt } = route.params;
+
+  // Estados do modal
   const [visivel, setVisivel] = useState(false);
   const [rua, setRua] = useState("");
   const [bairro, setBairro] = useState("");
   const [numero, setNumero] = useState("");
 
-  // Renderização da tela
   return (
-    <LinearGradient colors={["#f0f0f0", "#ffffff"]} style={styles.gradient}>
+    <LinearGradient colors={["#ffffff", "#045071"]} style={styles.gradient}>
       <ScrollView style={styles.container}>
         <Card style={styles.card}>
-          <Card.Cover source={{ uri: shirt.image }} style={styles.cardImage} />
+          <Card.Cover source={shirt.image} style={styles.cardImage} />
           <Card.Content style={styles.content}>
             <Title style={styles.cardTitle}>{shirt.name}</Title>
             <Paragraph style={styles.cardDescription}>
@@ -35,18 +40,16 @@ const DetalhesScreen = ({ route, navigation }) => {
               R$ {shirt.price.toFixed(2)}
             </Text>
 
-          {/* Seção: tamanhos disponíveis */}
-          <Text variant="titleSmall" style={styles.sectionTitle}>
-            Tamanhos Disponíveis:
-          </Text>
-          <View style={styles.chipContainer}>
-            {/* Cria um chip para cada tamanho da camisa */}
-            {shirt.sizes.map((size, i) => (
-              <Chip key={i} icon="tshirt-crew" style={styles.chip}>
-                {size}
-              </Chip>
-            ))}
-          </View>
+            <Text variant="titleSmall" style={styles.sectionTitle}>
+              Tamanhos Disponíveis:
+            </Text>
+            <View style={styles.chipContainer}>
+              {shirt.sizes.map((size, i) => (
+                <Chip key={i} icon="tshirt-crew" style={styles.chip}>
+                  {size}
+                </Chip>
+              ))}
+            </View>
 
             <Text variant="titleSmall" style={styles.sectionTitle}>
               Cores Disponíveis:
@@ -79,15 +82,12 @@ const DetalhesScreen = ({ route, navigation }) => {
         </Card>
       </ScrollView>
 
-      <Modal
-        visible={visivel}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setVisivel(false)}
-      >
+      {/* Modal de Endereço */}
+      {visivel && (
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Endereço de Entrega</Text>
+
             <TextInput
               placeholder="Rua"
               style={styles.input}
@@ -107,6 +107,7 @@ const DetalhesScreen = ({ route, navigation }) => {
               value={numero}
               onChangeText={setNumero}
             />
+
             <Button
               onPress={() => {
                 if (!rua || !bairro || !numero) {
@@ -120,24 +121,29 @@ const DetalhesScreen = ({ route, navigation }) => {
                 setVisivel(false);
               }}
               style={styles.finalizeButton}
+              mode="contained"
             >
               Finalizar Pedido
             </Button>
+
             <Button
               onPress={() => setVisivel(false)}
               style={styles.cancelButton}
+              mode="outlined"
             >
               Cancelar
             </Button>
           </View>
         </View>
-      </Modal>
+      )}
     </LinearGradient>
   );
 };
 
-// Estilos usados no componente
 const styles = StyleSheet.create({
+  gradient: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     padding: 15,
@@ -152,7 +158,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 15,
   },
   content: {
-    padding: 15,       
+    padding: 15,
   },
   cardTitle: {
     fontWeight: "bold",
@@ -181,8 +187,9 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   chip: {
-    marginRight: 5,  
-    marginBottom: 5, 
+    marginRight: 5,
+    marginBottom: 5,
+    borderRadius: 10,
   },
   actions: {
     justifyContent: "space-around",
@@ -193,11 +200,16 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 5,
   },
+  // Modal
   modalContainer: {
-    flex: 1,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fundo semi-transparente
   },
   modalContent: {
     width: "80%",
@@ -210,12 +222,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 15,
+    textAlign: "center",
   },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 5,
-    padding: 10,
     marginVertical: 10,
   },
   finalizeButton: {

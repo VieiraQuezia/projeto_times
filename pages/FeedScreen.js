@@ -104,7 +104,7 @@ const shirtsData = [
     id: 11,
     name: "Camisa Botafogo 2024",
     price: 279.90,
-    image: {botafogo}, 
+    image: botafogo, 
     sizes: ["P", "M", "G", "GG"],
     colors: ["Preto", "Branco"]
   },
@@ -133,7 +133,7 @@ const FeedScreen = () => {
       onPress={() => navigation.navigate('Detalhes', { shirt: item })}
     >
       <Card.Cover 
-        source={typeof item.image === "string" ? { uri: item.image } : item.image} 
+        source={item.image} 
       />
       <Card.Content>
         <Title style={styles.cardTitle}>{item.name}</Title>

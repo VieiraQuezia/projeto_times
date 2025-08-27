@@ -18,7 +18,7 @@ const { height } = Dimensions.get('window');
 
 const LoginScreen = () => {
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState(''); // ✅ estado da senha
+  const [password, setPassword] = useState(''); 
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
@@ -34,6 +34,8 @@ const LoginScreen = () => {
       
       if (username === 'aluno' && password === '123') {
         navigation.navigate('Feed');
+        Alert.alert('Login Realizado', 'Usuário ou senha incorretos');
+
       } else {
         Alert.alert('Erro', 'Usuário ou senha incorretos');
       }
