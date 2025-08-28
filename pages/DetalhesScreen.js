@@ -77,10 +77,10 @@ const DetalhesScreen = ({ route, navigation }) => {
     try {
       // Recarrega curtidos do AsyncStorage para garantir estado atualizado
       const curtidosRaw = await AsyncStorage.getItem('@likedShirts');
-      const curtidos = curtidosRaw ? JSON.parse(curtidosRaw) : [];
+      const curtidos = curtidosRaw ? JSON.parse(curtidosRaw) : []; //se tiver algo, coloca dentro do array curtidos; se nao, array vazio
 
       const isLiked = curtidos.some(item => item.id === shirt.id); // Vê se já tem um id igual no array (ou seja, já está curtida)
-      let updatedLikes = [];
+      let updatedLikes = []; // Novo array de curtidos
 
       if (isLiked) {
         updatedLikes = curtidos.filter(item => item.id !== shirt.id); // Se já tiver, vai fazer um novo array sem ela (descurtir)
