@@ -39,8 +39,8 @@ const DetalhesScreen = ({ route, navigation }) => {
   const liked = likedShirts.some(item => item.id === shirt.id);
 
   // Estados para seleção
-  const [selectedSize, setSelectedSize] = useState(null);
-  const [selectedColor, setSelectedColor] = useState(null);
+  const [tamEscolhido, setTamEscolhido] = useState(null);
+  const [corEscolhida, setCorEscolhida] = useState(null);
 
   // Carrega usuário e curtidas ao montar
   useEffect(() => {
@@ -143,10 +143,10 @@ const DetalhesScreen = ({ route, navigation }) => {
                     icon="tshirt-crew"
                     style={[
                       styles.chip,
-                      selectedSize === size && { backgroundColor: "#045071" }
+                      tamEscolhido === size && { backgroundColor: "#045071" }
                     ]}
-                    textStyle={selectedSize === size ? { color: "#fff" } : {}}
-                    onPress={() => setSelectedSize(size)}
+                    textStyle={tamEscolhido === size ? { color: "#fff" } : {}}
+                    onPress={() => setTamEscolhido(size)}
                   >
                     {size}
                   </Chip>
@@ -164,10 +164,10 @@ const DetalhesScreen = ({ route, navigation }) => {
                     icon="palette"
                     style={[
                       styles.chip,
-                      selectedColor === color && { backgroundColor: "#045071" }
+                      corEscolhida === color && { backgroundColor: "#045071" }
                     ]}
-                    textStyle={selectedColor === color ? { color: "#fff" } : {}}
-                    onPress={() => setSelectedColor(color)}
+                    textStyle={corEscolhida === color ? { color: "#fff" } : {}}
+                    onPress={() => setCorEscolhida(color)}
                   >
                     {color}
                   </Chip>
@@ -180,7 +180,7 @@ const DetalhesScreen = ({ route, navigation }) => {
                 mode="contained"
                 onPress={() => setVisivel(true)}
                 style={styles.button}
-                disabled={!selectedSize || !selectedColor}
+                disabled={!tamEscolhido || !corEscolhida}
               >
                 Comprar
               </Button>
@@ -235,7 +235,7 @@ const DetalhesScreen = ({ route, navigation }) => {
                     Alert.alert("Erro", "Por favor, preencha todos os campos.");
                     return;
                   }
-                  Alert.alert("Sucesso", `Pedido realizado!\nTamanho: ${selectedSize}\nCor: ${selectedColor}`);
+                  Alert.alert("Sucesso", `Pedido realizado!\nTamanho: ${tamEscolhido}\nCor: ${corEscolhida}`);
                   setRua("");
                   setBairro("");
                   setNumero("");
