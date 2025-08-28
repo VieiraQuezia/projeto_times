@@ -6,6 +6,7 @@ import LoginScreen from './pages/LoginScreen';
 import FeedScreen from './pages/FeedScreen';
 import DetalhesScreen from './pages/DetalhesScreen';
 import HomeScreen from './pages/Home'
+import LikedScreen from './pages/LikedScreen'
 
 const Stack = createNativeStackNavigator();
 
@@ -43,6 +44,11 @@ const App = () => {
             name="Detalhes" 
             component={DetalhesScreen} 
             options={{ title: 'Detalhes' }}
+          />
+          <Stack.Screen 
+            name="Curtidos" 
+            component={LikedScreen} 
+            options={{ title: 'Curtidos' }}
           />
         </Stack.Navigator>
       </NavigationContainer>

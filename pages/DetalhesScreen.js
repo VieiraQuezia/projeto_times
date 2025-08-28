@@ -4,7 +4,10 @@ import {
   StyleSheet,
   Alert,
   ScrollView,
-  Image
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableOpacity,
 } from "react-native";
 import {
   Card,
@@ -16,34 +19,97 @@ import {
   TextInput,
 } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
-import AsyncStorage from "@react-native-async-storage/async-storage"; 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { MaterialIcons } from '@expo/vector-icons';
 
 const DetalhesScreen = ({ route, navigation }) => {
-  const { shirt } = route.params;
+  const { shirt, onLikeUpdated } = route.params;
 
   // Estados do modal
   const [visivel, setVisivel] = useState(false);
   const [rua, setRua] = useState("");
   const [bairro, setBairro] = useState("");
   const [numero, setNumero] = useState("");
- const [usuario, setUsuario] = useState(null);
+  const [usuario, setUsuario] = useState(null);
 
+  // Estado local das camisas curtidas
+  const [likedShirts, setLikedShirts] = useState([]);
+
+  // Verifica se a camisa está curtida
+  const liked = likedShirts.some(item => item.id === shirt.id);
+
+  // Estados para seleção
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedColor, setSelectedColor] = useState(null);
+
+  // Carrega usuário e curtidas ao montar
   useEffect(() => {
     const carregarUsuario = async () => {
       try {
-        const data = await AsyncStorage.getItem('@usuario'); 
+        const data = await AsyncStorage.getItem('@usuario');
         if (data !== null) {
-          setUsuario(JSON.parse(data)); 
+          setUsuario(JSON.parse(data));
         }
       } catch (e) {
         console.log('Erro ao carregar usuário:', e);
       }
     };
+
+    const carregarCurtidos = async () => {
+      try {
+        const curtidosRaw = await AsyncStorage.getItem('@likedShirts');
+        if (curtidosRaw !== null) {
+          setLikedShirts(JSON.parse(curtidosRaw));
+        } else {
+          setLikedShirts([]);
+        }
+      } catch (e) {
+        console.log('Erro ao carregar curtidos:', e);
+      }
+    };
+
     carregarUsuario();
+    carregarCurtidos();
   }, []);
+
+  // Função para curtir/descurtir camisa, sempre atualizando AsyncStorage e estado local
+  const Likee = async (shirt) => {
+    try {
+      // Recarrega curtidos do AsyncStorage para garantir estado atualizado
+      const curtidosRaw = await AsyncStorage.getItem('@likedShirts');
+      const curtidos = curtidosRaw ? JSON.parse(curtidosRaw) : [];
+
+      const isLiked = curtidos.some(item => item.id === shirt.id);
+      let updatedLikes = [];
+
+      if (isLiked) {
+        updatedLikes = curtidos.filter(item => item.id !== shirt.id);
+      } else {
+        updatedLikes = [...curtidos, shirt];
+      }
+
+      // Salva no AsyncStorage
+      await AsyncStorage.setItem('@likedShirts', JSON.stringify(updatedLikes));
+      // Atualiza estado local para refletir imediatamente
+      setLikedShirts(updatedLikes);
+
+      // Se a tela anterior passou callback para atualizar estado, chama ela
+      if (onLikeUpdated) {
+        onLikeUpdated(updatedLikes);
+      }
+    } catch (e) {
+      console.log('Erro ao salvar curtidos:', e);
+    }
+  };
+
   return (
-    <LinearGradient colors={["#ffffff", "#045071"]} style={styles.gradient}>
-     {/* Header com usuário */}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+      style={{ flex: 1 }}
+    >
+      <LinearGradient colors={["#ffffff", "#045071"]} style={styles.gradient}>
+        {/* Header com usuário */}
         {usuario && (
           <View style={styles.userHeader}>
             <Text style={styles.userName}>{usuario.nickname}</Text>
@@ -53,116 +119,146 @@ const DetalhesScreen = ({ route, navigation }) => {
             />
           </View>
         )}
-      <ScrollView style={styles.container}>
-        <Card style={styles.card}>
-          <Card.Cover source={shirt.image} style={styles.cardImage} />
-          <Card.Content style={styles.content}>
-            <Title style={styles.cardTitle}>{shirt.name}</Title>
-            <Paragraph style={styles.cardDescription}>
-              {shirt.description || "Camisa oficial do time"}
-            </Paragraph>
+        <ScrollView style={styles.container}>
+          <Card style={styles.card}>
+            <Card.Cover source={shirt.image} style={styles.cardImage} />
+            <Card.Content style={styles.content}>
+              <Title style={styles.cardTitle}>{shirt.name}</Title>
+              <Paragraph style={styles.cardDescription}>
+                {shirt.description || "Camisa oficial do time"}
+              </Paragraph>
 
-            <Text variant="titleMedium" style={styles.price}>
-              R$ {shirt.price.toFixed(2)}
-            </Text>
+              <Text variant="titleMedium" style={styles.price}>
+                R$ {shirt.price.toFixed(2)}
+              </Text>
 
-            <Text variant="titleSmall" style={styles.sectionTitle}>
-              Tamanhos Disponíveis:
-            </Text>
-            <View style={styles.chipContainer}>
-              {shirt.sizes.map((size, i) => (
-                <Chip key={i} icon="tshirt-crew" style={styles.chip}>
-                  {size}
-                </Chip>
-              ))}
+              {/* Seleção de tamanho */}
+              <Text variant="titleSmall" style={styles.sectionTitle}>
+                Tamanhos Disponíveis:
+              </Text>
+              <View style={styles.chipContainer}>
+                {shirt.sizes.map((size, i) => (
+                  <Chip
+                    key={i}
+                    icon="tshirt-crew"
+                    style={[
+                      styles.chip,
+                      selectedSize === size && { backgroundColor: "#045071" }
+                    ]}
+                    textStyle={selectedSize === size ? { color: "#fff" } : {}}
+                    onPress={() => setSelectedSize(size)}
+                  >
+                    {size}
+                  </Chip>
+                ))}
+              </View>
+
+              {/* Seleção de cor */}
+              <Text variant="titleSmall" style={styles.sectionTitle}>
+                Cores Disponíveis:
+              </Text>
+              <View style={styles.chipContainer}>
+                {shirt.colors.map((color, i) => (
+                  <Chip
+                    key={i}
+                    icon="palette"
+                    style={[
+                      styles.chip,
+                      selectedColor === color && { backgroundColor: "#045071" }
+                    ]}
+                    textStyle={selectedColor === color ? { color: "#fff" } : {}}
+                    onPress={() => setSelectedColor(color)}
+                  >
+                    {color}
+                  </Chip>
+                ))}
+              </View>
+            </Card.Content>
+
+            <Card.Actions style={styles.actions}>
+              <Button
+                mode="contained"
+                onPress={() => setVisivel(true)}
+                style={styles.button}
+                disabled={!selectedSize || !selectedColor}
+              >
+                Comprar
+              </Button>
+              <Button
+                mode="outlined"
+                onPress={() => navigation.goBack()}
+                style={styles.button}
+              >
+                Voltar
+              </Button>
+
+              <TouchableOpacity
+                style={styles.likeButton}
+                onPress={() => Likee(shirt)}
+                activeOpacity={0.7}
+              >
+                <MaterialIcons name={liked ? "favorite" : "favorite-border"} size={40} color={liked ? "red" : "gray"} />
+              </TouchableOpacity>
+            </Card.Actions>
+          </Card>
+        </ScrollView>
+
+        {/* Modal de Endereço */}
+        {visivel && (
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Endereço de Entrega</Text>
+
+              <TextInput
+                placeholder="Rua"
+                style={styles.input}
+                value={rua}
+                onChangeText={setRua}
+              />
+              <TextInput
+                placeholder="Bairro"
+                style={styles.input}
+                value={bairro}
+                onChangeText={setBairro}
+              />
+              <TextInput
+                placeholder="Número da Casa"
+                keyboardType="numeric"
+                style={styles.input}
+                value={numero}
+                onChangeText={setNumero}
+              />
+
+              <Button
+                onPress={() => {
+                  if (!rua || !bairro || !numero) {
+                    Alert.alert("Erro", "Por favor, preencha todos os campos.");
+                    return;
+                  }
+                  Alert.alert("Sucesso", `Pedido realizado!\nTamanho: ${selectedSize}\nCor: ${selectedColor}`);
+                  setRua("");
+                  setBairro("");
+                  setNumero("");
+                  setVisivel(false);
+                }}
+                style={styles.finalizeButton}
+                mode="contained"
+              >
+                Finalizar Pedido
+              </Button>
+
+              <Button
+                onPress={() => setVisivel(false)}
+                style={styles.cancelButton}
+                mode="outlined"
+              >
+                Cancelar
+              </Button>
             </View>
-
-            <Text variant="titleSmall" style={styles.sectionTitle}>
-              Cores Disponíveis:
-            </Text>
-            <View style={styles.chipContainer}>
-              {shirt.colors.map((color, i) => (
-                <Chip key={i} icon="palette" style={styles.chip}>
-                  {color}
-                </Chip>
-              ))}
-            </View>
-          </Card.Content>
-
-          <Card.Actions style={styles.actions}>
-            <Button
-              mode="contained"
-              onPress={() => setVisivel(true)}
-              style={styles.button}
-            >
-              Comprar
-            </Button>
-            <Button
-              mode="outlined"
-              onPress={() => navigation.goBack()}
-              style={styles.button}
-            >
-              Voltar
-            </Button>
-          </Card.Actions>
-        </Card>
-      </ScrollView>
-
-      {/* Modal de Endereço */}
-      {visivel && (
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Endereço de Entrega</Text>
-
-            <TextInput
-              placeholder="Rua"
-              style={styles.input}
-              value={rua}
-              onChangeText={setRua}
-            />
-            <TextInput
-              placeholder="Bairro"
-              style={styles.input}
-              value={bairro}
-              onChangeText={setBairro}
-            />
-            <TextInput
-              placeholder="Número da Casa"
-              keyboardType="numeric"
-              style={styles.input}
-              value={numero}
-              onChangeText={setNumero}
-            />
-
-            <Button
-              onPress={() => {
-                if (!rua || !bairro || !numero) {
-                  Alert.alert("Erro", "Por favor, preencha todos os campos.");
-                  return;
-                }
-                Alert.alert("Sucesso", "Item adicionado ao carrinho");
-                setRua("");
-                setBairro("");
-                setNumero("");
-                setVisivel(false);
-              }}
-              style={styles.finalizeButton}
-              mode="contained"
-            >
-              Finalizar Pedido
-            </Button>
-
-            <Button
-              onPress={() => setVisivel(false)}
-              style={styles.cancelButton}
-              mode="outlined"
-            >
-              Cancelar
-            </Button>
           </View>
-        </View>
-      )}
-    </LinearGradient>
+        )}
+      </LinearGradient>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -178,7 +274,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     elevation: 5,
     backgroundColor: "rgba(255, 255, 255, 0.95)",
-    marginTop:130,
+    marginTop: 130,
   },
   cardImage: {
     borderTopLeftRadius: 15,
@@ -263,7 +359,7 @@ const styles = StyleSheet.create({
   cancelButton: {
     marginTop: 10,
   },
-    userHeader: {
+  userHeader: {
     position: 'absolute',
     top: 40,
     right: 20,
@@ -283,6 +379,9 @@ const styles = StyleSheet.create({
     borderRadius: 22.5,
     borderWidth: 2,
     borderColor: '#fff',
+  },
+  likeButton: {
+    marginLeft: 10,
   },
 });
 
