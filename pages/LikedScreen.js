@@ -20,7 +20,7 @@ const CurtidosScreen = () => {
       try {
         const curtidos = await AsyncStorage.getItem('@likedShirts');
         if (curtidos !== null) {
-          setLikedShirts(JSON.parse(curtidos));
+          setLikedShirts(JSON.parse(curtidos)); //o que tiver nos curtidos vai ser colocado no likedShirts
         }
       } catch (e) {
         console.log('Erro ao carregar curtidos:', e);
