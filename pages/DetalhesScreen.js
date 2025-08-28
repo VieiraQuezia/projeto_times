@@ -57,9 +57,9 @@ const DetalhesScreen = ({ route, navigation }) => {
 
     const carregarCurtidos = async () => {
       try {
-        const curtidosRaw = await AsyncStorage.getItem('@likedShirts');
-        if (curtidosRaw !== null) {
-          setLikedShirts(JSON.parse(curtidosRaw));
+        const curtidos111 = await AsyncStorage.getItem('@likedShirts');
+        if (curtidos111 !== null) {
+          setLikedShirts(JSON.parse(curtidos111));
         } else {
           setLikedShirts([]);
         }
