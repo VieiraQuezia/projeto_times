@@ -1,31 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  StyleSheet, 
-  FlatList, 
-  RefreshControl, 
-  Platform, 
-  Image, 
-  Text 
-} from 'react-native';
+import { View, StyleSheet, FlatList, RefreshControl, Platform, Image, Text, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Card, Title, Paragraph } from 'react-native-paper';
+import { Card, Title, Paragraph, Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Picker } from '@react-native-picker/picker'; 
-
-//imagens camisas
-import atleticomg from '../assets/camisas/atleticomg.jpg'
-import corinthians from '../assets/camisas/corinthians.jpg'
-import corinthians2 from '../assets/camisas/corinthians2.jpg'
-import palmeiras from '../assets/camisas/palmeiras.jpg'
-import cruzeiro from '../assets/camisas/cruzeiro.jpg'
-import flamengo from '../assets/camisas/flamengo.jpg'
-import fluminense from '../assets/camisas/fluminense.jpg'
-import internacional from '../assets/camisas/internacional.jpg'
-import santos from '../assets/camisas/santos1.jpg'
-import saopaulo from '../assets/camisas/saopaulo.jpg'
-import vasco from '../assets/camisas/vasco.jpg'
+import { Picker } from '@react-native-picker/picker';
+// Imagens camisas
+import atleticomg from '../assets/camisas/atleticomg.jpg';
+import corinthians from '../assets/camisas/corinthians.jpg';
+import corinthians2 from '../assets/camisas/corinthians2.jpg';
+import palmeiras from '../assets/camisas/palmeiras.jpg';
+import cruzeiro from '../assets/camisas/cruzeiro.jpg';
+import flamengo from '../assets/camisas/flamengo.jpg';
+import fluminense from '../assets/camisas/fluminense.jpg';
+import internacional from '../assets/camisas/internacional.jpg';
+import santos from '../assets/camisas/santos1.jpg';
+import saopaulo from '../assets/camisas/saopaulo.jpg';
+import vasco from '../assets/camisas/vasco.jpg';
 
 const shirtsData = [
   { id: 1, name: "Camisa Flamengo 2024", price: 299.90, image: flamengo, sizes: ["P", "M", "G", "GG"], colors: ["Vermelho", "Preto"] },
@@ -45,21 +36,35 @@ const shirtsData = [
 const FeedScreen = () => {
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
-  const [selectedTeam, setSelectedTeam] = useState("Todos"); 
+  const [selectedTeam, setSelectedTeam] = useState("Todos");
   const [usuario, setUsuario] = useState(null);
+  const [likedShirts, setLikedShirts] = useState([]);
 
   useEffect(() => {
     const carregarUsuario = async () => {
       try {
-        const data = await AsyncStorage.getItem('@usuario'); 
+        const data = await AsyncStorage.getItem('@usuario');
         if (data !== null) {
-          setUsuario(JSON.parse(data)); 
+          setUsuario(JSON.parse(data));
         }
       } catch (e) {
         console.log('Erro ao carregar usuário:', e);
       }
     };
+
+    const carregarCurtidos = async () => {
+      try {
+        const curtidos = await AsyncStorage.getItem('@likedShirts');
+        if (curtidos !== null) {
+          setLikedShirts(JSON.parse(curtidos));
+        }
+      } catch (e) {
+        console.log('Erro ao carregar curtidos:', e);
+      }
+    };
+
     carregarUsuario();
+    carregarCurtidos();
   }, []);
 
   const onRefresh = () => {
@@ -67,14 +72,33 @@ const FeedScreen = () => {
     setTimeout(() => setRefreshing(false), 1500);
   };
 
-  const filteredShirts = selectedTeam === "Todos"
-    ? shirtsData
-    : shirtsData.filter(item => item.name.includes(selectedTeam));
+  const Likee = async (shirt) => {
+    const isLiked = likedShirts.some(item => item.id === shirt.id);
+    let updatedLikes = [];
+    if (isLiked) {
+      updatedLikes = likedShirts.filter(item => item.id !== shirt.id);
+    } else {
+      updatedLikes = [...likedShirts, shirt];
+    }
+    setLikedShirts(updatedLikes);
+    try {
+      await AsyncStorage.setItem('@likedShirts', JSON.stringify(updatedLikes));
+    } catch (e) {
+      console.log('Erro ao salvar curtidos:', e);
+    }
+  };
 
-  const renderItem = ({ item }) => (
+  const filteredShirts = selectedTeam === "Todos" ? shirtsData : shirtsData.filter(item => item.name.includes(selectedTeam));
+const renderItem = ({ item }) => {
+  return (
     <Card
       style={styles.card}
-      onPress={() => navigation.navigate('Detalhes', { shirt: item })}
+      onPress={() =>
+        navigation.navigate('Detalhes', {
+          shirt: item,
+          onLikeUpdated: (newLikedShirts) => setLikedShirts(newLikedShirts),
+        })
+      }
     >
       <Card.Cover source={item.image} />
       <Card.Content>
@@ -83,30 +107,32 @@ const FeedScreen = () => {
       </Card.Content>
     </Card>
   );
+};
+
 
   return (
     <LinearGradient colors={['#045071', '#ffffff']} style={styles.gradient}>
       <View style={styles.container}>
-
         {/* Header com usuário */}
         {usuario && (
           <View style={styles.userHeader}>
             <Text style={styles.userName}>{usuario.nickname}</Text>
-            <Image
-              source={{ uri: usuario.foto || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }}
-              style={styles.userImage}
-            />
+            <Image source={{ uri: usuario.foto || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }} style={styles.userImage} />
           </View>
         )}
 
+        {/* Botão para ir para tela de curtidos */}
+        <Button
+          mode="contained"
+          onPress={() => navigation.navigate('Curtidos')}
+          style={{ marginBottom: 10 }}
+        >
+          Ver Curtidos
+        </Button>
+
         {/* Picker */}
         {Platform.OS === "ios" ? (
-          <Picker
-            selectedValue={selectedTeam}
-            style={styles.pickerIOS}
-            onValueChange={(itemValue) => setSelectedTeam(itemValue)}
-            mode="dropdown"
-          >
+          <Picker selectedValue={selectedTeam} style={styles.pickerIOS} onValueChange={(itemValue) => setSelectedTeam(itemValue)} mode="dropdown" >
             <Picker.Item label="Todos os Times" value="Todos" />
             <Picker.Item label="Flamengo" value="Flamengo" />
             <Picker.Item label="Vasco" value="Vasco" />
@@ -122,13 +148,7 @@ const FeedScreen = () => {
           </Picker>
         ) : (
           <View style={styles.pickerAndroidWrapper}>
-            <Picker
-              selectedValue={selectedTeam}
-              style={styles.pickerAndroid}
-              onValueChange={(itemValue) => setSelectedTeam(itemValue)}
-              mode="dialog"
-              dropdownIconColor="black"
-            >
+            <Picker selectedValue={selectedTeam} style={styles.pickerAndroid} onValueChange={(itemValue) => setSelectedTeam(itemValue)} mode="dialog" dropdownIconColor="black" >
               <Picker.Item label="Todos os Times" value="Todos" />
               <Picker.Item label="Flamengo" value="Flamengo" />
               <Picker.Item label="Vasco" value="Vasco" />
@@ -152,11 +172,7 @@ const FeedScreen = () => {
           keyExtractor={item => item.id.toString()}
           contentContainerStyle={styles.list}
           refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              colors={['#bb86fc']}
-            />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#bb86fc']} />
           }
         />
       </View>
@@ -175,47 +191,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 10,
   },
-  userName: {
-    color: 'white',
-    fontWeight: 'bold',
-    marginRight: 10,
-    fontSize: 16,
-  },
-  userImage: {
-    width: 45,
-    height: 45,
-    borderRadius: 22.5,
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
-  pickerIOS: {
-    marginTop: 30, 
-    color: 'black',
-    height: 50,
-    marginBottom: 150,
-  },
-  pickerAndroidWrapper: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    marginTop: 80,
-    marginBottom: 20,
-    overflow: 'hidden',
-  },
-  pickerAndroid: {
-    color: 'black',
-    height: 50,
-    width: '100%',
-  },
-  card: {
-    marginBottom: 15,
-    borderRadius: 15,
-    elevation: 5,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-  },
+  userName: { color: 'white', fontWeight: 'bold', marginRight: 10, fontSize: 16 },
+  userImage: { width: 45, height: 45, borderRadius: 22.5, borderWidth: 2, borderColor: '#fff' },
+  pickerIOS: { marginTop: 30, color: 'black', height: 50, marginBottom: 150 },
+  pickerAndroidWrapper: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, marginTop: 80, marginBottom: 20, overflow: 'hidden' },
+  pickerAndroid: { color: 'black', height: 50, width: '100%' },
+  card: { marginBottom: 15, borderRadius: 15, elevation: 5, backgroundColor: 'rgba(255, 255, 255, 0.9)', position: 'relative' },
   cardTitle: { fontWeight: 'bold', fontSize: 16 },
   cardPrice: { fontSize: 14, color: '#6200ee', marginVertical: 5 },
   list: { paddingBottom: 20 },
+
 });
 
 export default FeedScreen;
