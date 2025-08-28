@@ -79,13 +79,13 @@ const DetalhesScreen = ({ route, navigation }) => {
       const curtidosRaw = await AsyncStorage.getItem('@likedShirts');
       const curtidos = curtidosRaw ? JSON.parse(curtidosRaw) : [];
 
-      const isLiked = curtidos.some(item => item.id === shirt.id);
+      const isLiked = curtidos.some(item => item.id === shirt.id); // Vê se já tem um id igual no array (ou seja, já está curtida)
       let updatedLikes = [];
 
       if (isLiked) {
-        updatedLikes = curtidos.filter(item => item.id !== shirt.id);
+        updatedLikes = curtidos.filter(item => item.id !== shirt.id); // Se já tiver, vai fazer um novo array sem ela (descurtir)
       } else {
-        updatedLikes = [...curtidos, shirt];
+        updatedLikes = [...curtidos, shirt]; // Se nao, vai add ao array
       }
 
       // Salva no AsyncStorage
@@ -93,7 +93,7 @@ const DetalhesScreen = ({ route, navigation }) => {
       // Atualiza estado local para refletir imediatamente
       setLikedShirts(updatedLikes);
 
-      // Se a tela anterior passou callback para atualizar estado, chama ela
+      // Se a tela anterior passou callback para atualizar estado, chama-a
       if (onLikeUpdated) {
         onLikeUpdated(updatedLikes);
       }
